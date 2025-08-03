@@ -18,30 +18,31 @@ class AuthTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertStatus(200)
+        $response->assertStatus(201) // or 200 if you're not returning 201
                  ->assertJsonStructure([
                      'access_token',
                      'token_type',
                      'expires_in',
                      'user' => ['id', 'name', 'email']
                  ]);
-    }
+    } 
 
     public function test_user_can_login()
 {
-    // First, create a user
+    // First, create a user in the database
     $user = \App\Models\User::create([
-        'name' => 'Test Login',
+        'name' => 'Login User',
         'email' => 'login@example.com',
         'password' => bcrypt('password'),
     ]);
 
-    // Now try to login
+    // Attempt to log in
     $response = $this->postJson('/api/auth/login', [
         'email' => 'login@example.com',
         'password' => 'password',
     ]);
 
+    // Assert we receive expected structure
     $response->assertStatus(200)
              ->assertJsonStructure([
                  'access_token',
@@ -50,5 +51,6 @@ class AuthTest extends TestCase
                  'user' => ['id', 'name', 'email']
              ]);
 }
+
 
 }
